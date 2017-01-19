@@ -31,14 +31,3 @@ function kala_revision_batch_delete_menu() {
   );
   return $items;
 }
-
-/**
- * Implements hook_preprocess_page().
- */
-function kala_revision_batch_delete_preprocess_page($vars) {
-  // Add css to finx the form a little.
-  if (current_path() == 'admin/config/content/revision-batch-delete') {
-    $path = drupal_get_path('module', 'kala_revision_batch_delete');
-    drupal_add_css($path . '/css/kala-revision-batch-delete.css');
-  }
-}

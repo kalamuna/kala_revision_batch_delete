@@ -30,18 +30,12 @@ function kala_revision_batch_delete_form() {
       '#options' => $content,
     );
 
-    // Set up the date.
-    $ago = strtotime('-90 days');
-    $format = 'Y-m-d';
-    $default =  date($format, $ago);
-
+    // Date text field.
     $form['date'] = array(
-      '#type' => 'date_select',
-      '#title' => t('Delete all nodes before this date.'),
-      '#description' => t('Defaults to 90 days ago.'),
-      '#default_value' => $default,
-      '#date_format' => $format,
-      '#date_label_position' => 'none',
+      '#type' => 'textfield',
+      '#title' => t('Delete nodes revisions before this time since last node update.'),
+      '#description' => t('Enter as a -1 day, 1-year, etc. Defaults to -90 days.'),
+      '#default_value' => t('-90 days'),
       '#required' => TRUE,
     );
 
@@ -80,9 +74,9 @@ function kala_revision_batch_delete_form_submit($form, &$form_state) {
     }
   }
 
-  // Grab the date.
+  // Grab the string date.
   if (isset($values['date'])) {
-    $time = strtotime($values['date']);
+    $time = $values['date'];
   }
 
   // If we have above, lets do this!
@@ -92,12 +86,11 @@ function kala_revision_batch_delete_form_submit($form, &$form_state) {
     $sql = "SELECT n.nid FROM {node} n INNER JOIN {node_revision} r ON r.nid = n.nid WHERE n.type IN (:types) GROUP BY r.nid";
     $query = db_query($sql, array(':types' => $types));
     $nids = $query->fetchAllKeyed(0,0);
-    $count = count($nids);
 
     // Throw our chunks into the batch.
-    $chunks = array_chunk($nids, 100);
+    $chunks = array_chunk($nids, 50);
     foreach ($chunks as $chunk) {
-      $operations[] = array("kala_revision_batch_delete_batch_process", array($chunk, $time, $count));
+      $operations[] = array("kala_revision_batch_delete_batch_process", array($chunk, $time));
     }
 
     // Engage.
