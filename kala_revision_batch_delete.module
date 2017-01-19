@@ -1,0 +1,44 @@
+<?php
+
+/**
+ * Module File for Kala Revision Batch Delete.
+ */
+
+/**
+ * Implements hook_permission().
+ */
+function kala_revision_batch_delete_permission() {
+  return array(
+    'administer kala revision batch delete' => array(
+      'title' => t('Administer Kala Revision Batch Delete'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function kala_revision_batch_delete_menu() {
+  $items = array();
+  $items['admin/config/content/revision-batch-delete'] = array(
+    'title' => 'Batch Delete Revisions',
+    'description' => 'Deletes content types revisions based off a timestamp via batch.',
+    'type' => MENU_NORMAL_ITEM,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('kala_revision_batch_delete_form'),
+    'access arguments' => array('administer kala revision batch delete'),
+    'file' => 'includes/kala_revision_batch_delete.admin.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function kala_revision_batch_delete_preprocess_page($vars) {
+  // Add css to finx the form a little.
+  if (current_path() == 'admin/config/content/revision-batch-delete') {
+    $path = drupal_get_path('module', 'kala_revision_batch_delete');
+    drupal_add_css($path . '/css/kala-revision-batch-delete.css');
+  }
+}

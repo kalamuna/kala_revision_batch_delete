@@ -1,0 +1,10 @@
+name = Kala Revision Batch Delete
+description = Deletes content types revisions based off a timestamp via batch.
+package = Kalamuna
+core = 7.x
+version = 7.x-0.1
+
+dependencies[] = node
+dependencies[] = date
+
+configure = admin/config/content/revision-batch-delete
