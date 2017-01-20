@@ -9,34 +9,21 @@
  * @param array $chunk
  *   The chunk of nids we are going to work on.
  *
- * @param string $time
- *   The timestamp we are checking.
+ * @param int $count
+ *   The total amount of vids to delete.
  *
  * @param  object &$context
  *   The batch context object.
  */
-function kala_revision_batch_delete_batch_process($chunk, $time, &$context) {
+function kala_revision_batch_delete_batch_process($chunk, $count, &$context) {
   // Update our progress information.
-  $context['message'] = t('Deleting revisions in chunks of 50 nids.');
+  $context['message'] = t(':count revisions to delete total.  Deleting revisions in chunks of 50 nids.', array(':count' => $count));
 
-  // Grab all the nodes.
-  $nodes = node_load_multiple($chunk);
-
-  // Process each one.
-  foreach ($nodes as $node) {
-    // Get time difference from last update.
-    $diff = strtotime($time, $node->changed);
-
-    // Grab our revisions.
-    $sql = "SELECT r.vid FROM {node_revision} r LEFT JOIN {node} n ON n.nid = r.nid WHERE r.nid = :nid AND r.timestamp < :diff AND n.vid <> r.vid ORDER BY r.timestamp DESC;";
-    $query = db_query($sql, array(':nid' => $node->nid, ':diff' => $diff));
-
-
-    // Go through and delete the revisions.
-    foreach ($query->fetchAllKeyed(0,0) as $vid) {
-      node_revision_delete($vid);
-      $context['results'][] = $vid;
-    }
+  // Go through and delete the vids.
+  foreach ($chunk as $vid) {
+    // Will prevent deleting current revision.
+    node_revision_delete($vid);
+    $context['results'][] = $vid;
   }
 }
 
